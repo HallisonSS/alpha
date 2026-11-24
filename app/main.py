@@ -7,7 +7,8 @@ from app.db import close_pool, ensure_schema
 from app.redis_client import close_redis, get_redis
 from app.routers import admin, chat, events, system, voice
 from app.routers import kiln as kiln_router
-     app.include_router(kiln_router.router)
+
+app.include_router(kiln_router.router)
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 
