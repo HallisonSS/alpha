@@ -8,7 +8,6 @@ from app.redis_client import close_redis, get_redis
 from app.routers import admin, chat, events, system, voice
 from app.routers import kiln as kiln_router
 
-app.include_router(kiln_router.router)
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 
@@ -31,3 +30,4 @@ app.include_router(events.router)
 app.include_router(admin.router)
 app.include_router(chat.router)
 app.include_router(voice.router)
+app.include_router(kiln_router.router)
