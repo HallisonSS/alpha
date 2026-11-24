@@ -22,7 +22,12 @@ async def lifespan(_: FastAPI):
 
 
 # app é criado ANTES de qualquer include_router (o código antigo fazia o contrário => NameError)
-app = FastAPI(title="Assistente-IA API", lifespan=lifespan)
+app = FastAPI(
+    title="Donatello",
+    description="API do agente Donato di Niccolò di Betto Bardi SRE",
+    version="1.0.0",
+    lifespan=lifespan,
+)
 
 app.include_router(system.public)
 app.include_router(system.router)
