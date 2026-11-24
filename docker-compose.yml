@@ -117,7 +117,7 @@ services:
 
   kiln-worker:
     build:
-      context: ./agent
+      context: .
       dockerfile: Dockerfile
     command: ["python", "-m", "worker.kiln_worker"]
     restart: unless-stopped
