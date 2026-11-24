@@ -102,7 +102,7 @@ services:
       INFO: 1
       EXEC: 0
       VOLUMES: 0
-      NETWORKS: 0
+      NETWORKS: 1
       SERVICES: 0
       SWARM: 0
       SECRETS: 0
@@ -147,18 +147,17 @@ services:
       KILN_ADMIN_TOKEN: ${KILN_ADMIN_TOKEN:?defina KILN_ADMIN_TOKEN no .env}
       REDIS_URL: redis://redis:6379/0
 
-volumes:
-  kiln_workspaces:
-
-networks:                                                 # (ver docs/kiln/RUNBOOK.md). Externa de proposito: nenhum servico do compose entra nela.                           
-  kiln_egress:                                            # Egress controlada SOMENTE para instalar dependencias. Crie uma vez no host:
-    external: true                                        # sudo docker network create kiln_egress
-    name: kiln_egress                                     # e restrinja no firewall/proxy a registry.npmjs.org, pypi.org e files.pythonhosted.org
+#networks:                                                 # (ver docs/kiln/RUNBOOK.md). Externa de proposito: nenhum servico do compose entra nela.                           
+#  kiln_egress:                                            # Egress controlada SOMENTE para instalar dependencias. Crie uma vez no host:
+#    external: true                                        # sudo docker network create kiln_egress
+#    name: kiln_egress                                     # e restrinja no firewall/proxy a registry.npmjs.org, pypi.org e files.pythonhosted.org
                                                                                           
-networks: 
+networks:
   assist:
     name: assist
+    driver: bridge
 
 volumes:
   pgdata:
   redisdata:
+  kiln_workspaces:
