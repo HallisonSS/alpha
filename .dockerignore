@@ -1,6 +1,10 @@
 .env
-.git
 data
 __pycache__
 *.pyc
 *.zip
+.git
+.github
+.venv
+.pytest_cache
+.mypy_cache
