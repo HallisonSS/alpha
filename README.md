@@ -4,7 +4,8 @@
 
 ## Subir
 ```bash
-cd agent
+cd alpha
+git init
 ./setup.sh            # cria .env com senhas aleatórias e sobe (use sudo se o docker pedir)
 # ou manual:
 cp .env.example .env  # edite as 3 variáveis obrigatórias
