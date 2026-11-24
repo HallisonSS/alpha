@@ -54,9 +54,10 @@ RUN groupadd -g 10001 agent \
        /opt/kiln \
     && chown -R 10001:10001 \
        /app \
+       /opt/kiln \
        /work \
        /scratch \
-       /opt/kiln \
+       /kiln \
        /home/agent
 
 # ---------------------------------------------------------
