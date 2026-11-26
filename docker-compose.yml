@@ -91,73 +91,10 @@ services:
       retries: 3
       start_period: 20s
 
-  # Proxy minimo do Docker: o worker so cria/inicia/remove containers e le logs. Sem exec, sem volumes novos, sem imagens.
-  docker-proxy:
-    image: tecnativa/docker-socket-proxy:0.3.0
-    restart: unless-stopped
-    environment:
-      CONTAINERS: 1
-      POST: 1
-      IMAGES: 1        # leitura (inspect) da imagem do sandbox
-      INFO: 1
-      EXEC: 0
-      VOLUMES: 0
-      NETWORKS: 1
-      SERVICES: 0
-      SWARM: 0
-      SECRETS: 0
-      BUILD: 0
-      COMMIT: 0
-      AUTH: 0
-      SYSTEM: 0
-      PLUGINS: 0
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    networks: [assist]
-
-  kiln-worker:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: ["python", "-m", "worker.kiln_worker"]
-    restart: unless-stopped
-    user: "10001:10001"     # mesmo uid do sandbox: arquivos do volume ficam gravaveis pelos dois
-    env_file: [.env]
-    environment:
-      HOME: /tmp
-      DOCKER_HOST: tcp://docker-proxy:2375
-      REDIS_URL: redis://redis:6379/0
-      KILN_WORKSPACE_ROOT: /kiln/workspaces
-      KILN_WORKSPACE_VOLUME: kiln_workspaces
-      KILN_SANDBOX_IMAGE: kiln-sandbox:latest
-      KILN_EGRESS_NETWORK: kiln_egress
-      KILN_SCHEMA_PATH: /kiln/kiln.sql
-      KILN_METRICS_PORT: "9108"
-      KILN_MAX_PARALLEL: "2"
-    volumes:
-      - kiln_workspaces:/kiln/workspaces
-      - ./db/kiln.sql:/kiln/kiln.sql:ro
-#    depends_on: [postgres, redis, docker-proxy]
-    expose: ["9108"]
-    networks: [assist]
-    mem_limit: 512m
-                        
-  agent-api:                                              # O agent-api passa a expor /kiln/*: so precisa das mesmas variaveis.
-    environment:
-      KILN_ADMIN_TOKEN: ${KILN_ADMIN_TOKEN:?defina KILN_ADMIN_TOKEN no .env}
-      REDIS_URL: redis://redis:6379/0
-
-#networks:                                                 # (ver docs/kiln/RUNBOOK.md). Externa de proposito: nenhum servico do compose entra nela.                           
-#  kiln_egress:                                            # Egress controlada SOMENTE para instalar dependencias. Crie uma vez no host:
-#    external: true                                        # sudo docker network create kiln_egress
-#    name: kiln_egress                                     # e restrinja no firewall/proxy a registry.npmjs.org, pypi.org e files.pythonhosted.org
-                                                                                          
 networks:
   assist:
     name: assist
-    driver: bridge
 
 volumes:
   pgdata:
   redisdata:
-  kiln_workspaces:
