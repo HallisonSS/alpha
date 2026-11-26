@@ -32,8 +32,8 @@ jobs:
           file: agent/Dockerfile
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/ia-assistant:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/ia-assistant:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/agent:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/agent:${{ github.sha }}
 
       - name: Deploy Ubuntu Server
         uses: appleboy/ssh-action@v1.2.2
