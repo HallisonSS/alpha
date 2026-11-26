@@ -2,19 +2,25 @@ name: agent
 
 x-agent-common: &agent-common
   build:
-    context: ./agent
-    dockerfile: Dockerfile
-  image: agent-app:latest
+    context: .
+    dockerfile: agent/Dockerfile
+
+  image: ${DOCKERHUB_USERNAME}/ia-assistant:${IMAGE_TAG:-latest}
+
   restart: unless-stopped
-  env_file: .env
+  env_file:
+    - .env
+
   environment:
     REDIS_HOST: redis
     REDIS_PORT: "6379"
     POSTGRES_HOST: postgres
     POSTGRES_PORT: "5432"
   extra_hosts:
-    - "host.docker.internal:host-gateway"   # alcança o Ollama que roda no host
-  networks: [assist]
+    - "host.docker.internal:host-gateway"  
+
+  networks:
+    - assist
 
 services:
   postgres:
@@ -55,16 +61,24 @@ services:
       retries: 10
 
   agent-api:
+  agent-api:
     <<: *agent-common
-    container_name: agent-api
-    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    command:
+      - uvicorn
+      - app.main:app
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8000"
     ports:
-      - "${API_BIND:-0.0.0.0}:${API_PORT:-8000}:8000"
+      - "8000:8000"
+
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
+        
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=4).status == 200 else 1)"]
       interval: 10s
@@ -74,9 +88,11 @@ services:
 
   agent-worker:
     <<: *agent-common
-    container_name: agent-worker
-    # -m worker.worker (módulo) => "app" fica importável; "python worker/worker.py" quebraria o import
-    command: ["python", "-u", "-m", "worker.worker"]
+    command:
+      - python
+      - -m
+      - worker.worker
+
     depends_on:
       postgres:
         condition: service_healthy
@@ -84,6 +100,7 @@ services:
         condition: service_healthy
       agent-api:
         condition: service_healthy
+        
     healthcheck:
       test: ["CMD", "python", "-c", "import os,sys,time; sys.exit(0 if time.time()-os.path.getmtime('/tmp/worker.alive')<180 else 1)"]
       interval: 20s
