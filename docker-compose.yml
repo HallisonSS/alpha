@@ -2,7 +2,7 @@ name: agent
 
 x-agent-common: &agent-common
   build:
-    context: .
+    context: ./agent
     dockerfile: Dockerfile
   image: agent-app:latest
   restart: unless-stopped
