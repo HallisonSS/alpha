@@ -1,77 +1,58 @@
-name: build-and-push
+
+name: Agent CI/CD
 
 on:
   push:
-    branches: [main]
-    tags: ["v*.*.*"]
-  pull_request:
+    branches:
+      - main
+
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  docker:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - name: kiln-app
-            context: .
-            file: ./Dockerfile
-          - name: kiln-sandbox
-            context: ./kiln_sandbox
-            file: ./kiln_sandbox/Dockerfile
-          # novo serviço = nova linha aqui
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: docker/setup-buildx-action@v3
-
-      - name: Login no Docker Hub
-        if: github.event_name != 'pull_request'
+      - name: Login Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Metadados e tags
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.name }}
-          tags: |
-            type=raw,value=latest,enable={{is_default_branch}}
-            type=semver,pattern={{version}}
-            type=sha,format=short
-
-      - name: Build (para scan)
+      - name: Build and Push Agent
         uses: docker/build-push-action@v6
         with:
-          context: ${{ matrix.context }}
-          file: ${{ matrix.file }}
-          load: true
-          tags: scan:${{ matrix.name }}
-          cache-from: type=gha,scope=${{ matrix.name }}
-          cache-to: type=gha,mode=max,scope=${{ matrix.name }}
-
-      - name: Trivy
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          image-ref: scan:${{ matrix.name }}
-          severity: CRITICAL,HIGH
-          ignore-unfixed: true
-          exit-code: "0"   # mude para "1" quando quiser bloquear o push
-
-      - name: Push
-        if: github.event_name != 'pull_request'
-        uses: docker/build-push-action@v6
-        with:
-          context: ${{ matrix.context }}
-          file: ${{ matrix.file }}
+          context: .
+          file: agent/Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          platforms: linux/amd64
-          cache-from: type=gha,scope=${{ matrix.name }}
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/ia-assistant:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/ia-assistant:${{ github.sha }}
+
+      - name: Deploy Ubuntu Server
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.SERVER_WG_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
+          script: |
+            set -e
+
+            cd /opt/ia-assistant
+
+            git pull --ff-only origin main
+
+            docker compose config -q
+
+            docker compose pull agent-api agent-worker
+
+            docker compose up -d --no-build agent-api agent-worker
+
+            docker compose ps
