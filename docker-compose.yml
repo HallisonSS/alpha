@@ -86,7 +86,7 @@ services:
       start_period: 15s
 
   agent-worker:
-#    <<: *agent-common
+    <<: *agent-common
     command:
       - python
       - -m
