@@ -46,7 +46,7 @@ class Settings(BaseSettings):
     perm_memory_top_k: int = 5
     dedup_ttl: int = 300
 
-    executor_mode: str = "dry-run"  # dry-run | live
+    executor_mode: str = "live"  # dry-run | live
     check_allowed_hosts: str = "postgres,redis,agent-api,host.docker.internal,localhost"
 
 
