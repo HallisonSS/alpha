@@ -49,7 +49,7 @@ services:
     volumes:
       - kiln_workspaces:/kiln/workspaces
       - ./db/kiln.sql:/kiln/kiln.sql:ro
-    depends_on: [postgres, redis, docker-proxy]
+#    depends_on: [postgres, redis, docker-proxy]
     expose: ["9108"]
     networks: [assist]
     mem_limit: 512m
