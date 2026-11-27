@@ -32,7 +32,7 @@ services:
   kiln-worker:
     build:
       context: ./agent
-      dockerfile: Dockerfile
+    dockerfile: Dockerfile
     command: ["python", "-m", "worker.kiln_worker"]
     restart: unless-stopped
     user: "10001:10001"     # mesmo uid do sandbox: arquivos do volume ficam gravaveis pelos dois
