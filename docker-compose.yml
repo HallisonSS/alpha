@@ -19,8 +19,7 @@ x-agent-common: &agent-common
   extra_hosts:
     - "host.docker.internal:host-gateway"  
 
-  networks:
-    - assist
+  networks: [assist]
 
 services:
   postgres:
@@ -50,7 +49,7 @@ services:
     environment:
       REDIS_PASSWORD: ${REDIS_PASSWORD}
     ports:
-      - "10.8.0.2:${REDIS_HOST_PORT:-6380}:6379"   # só localhost: usado pelo host_runner
+      - "127.0.0.1:${REDIS_HOST_PORT:-6380}:6379"   # só localhost: usado pelo host_runner
     volumes:
       - redisdata:/data
     networks: [assist]
@@ -66,7 +65,7 @@ services:
       - uvicorn
       - app.main:app
       - --host
-      - 10.8.0.2
+      - 0.0.0.0
       - --port
       - "8000"
     ports:
