@@ -5,7 +5,7 @@ x-agent-common: &agent-common
     context: .
     dockerfile: agent/Dockerfile
 
-  image: ${DOCKERHUB_USERNAME}/ia-assistant:${IMAGE_TAG:-latest}
+#  image: ${DOCKERHUB_USERNAME}/ia-assistant:${IMAGE_TAG:-latest}
 
   restart: unless-stopped
   env_file:
