@@ -1,6 +1,6 @@
 # Override do KILN. Uso (a partir de ~/Documentos/agent):
-#   docker build -t kiln-sandbox:latest kiln-sandbox/
-#   docker compose -f docker-compose.yml -f docker-compose.kiln.yml --env-file .env up -d --build kiln-worker docker-proxy
+# sudo docker build -t kiln_sandbox:latest kiln_sandbox/
+# sudo docker compose -f docker-compose.yml -f docker-compose.kiln.yml --env-file .env up -d --build kiln-worker docker-proxy
 # Nao altera o compose existente: so ACRESCENTA servicos/volumes.
 # Premissas: servicos `postgres` e `redis` e rede `assist` ja existem no compose principal.
 
