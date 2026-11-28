@@ -42,7 +42,7 @@ services:
       DB_DSN: postgresql://${POSTGRES_USER:-assist}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-assistdb}
       HOME: /tmp
       DOCKER_HOST: tcp://docker-proxy:2375
-      REDIS_URL: redis://redis:6379/0
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
       KILN_WORKSPACE_ROOT: /kiln/workspaces
       KILN_WORKSPACE_VOLUME: kiln_workspaces
       KILN_SANDBOX_IMAGE: kiln-sandbox:latest
