@@ -18,6 +18,8 @@ COPY db ./db
 
 RUN useradd --system --uid 10001 --create-home agent \
     && chown -R agent:agent /app
+    && mkdir -p /kiln/workspaces \
+    && chown -R 10001:10001 /app /kiln
 
 USER agent
 
